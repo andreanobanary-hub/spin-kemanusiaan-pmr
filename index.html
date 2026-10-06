@@ -37,9 +37,9 @@
   </script>
 
   <style>
-    /* Deselerasi Halus Roda Putar */
+    /* Transisi Putaran Roda Halus & Alami */
     #wheel-canvas {
-      transition: transform 4.5s cubic-bezier(0.15, 0.95, 0.25, 1);
+      transition: transform 4.5s cubic-bezier(0.12, 0.95, 0.22, 1);
     }
 
     /* Cetak Piagam Resmi */
@@ -248,7 +248,7 @@
       <!-- Area Roda Putar Roulette -->
       <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden backdrop-blur-md">
         
-        <!-- Jarum Penunjuk Atas -->
+        <!-- Jarum Penunjuk Atas (Arah Jam 12) -->
         <div class="z-20 -mb-5 flex flex-col items-center pointer-events-none">
           <div class="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[26px] border-t-amber-400 drop-shadow-[0_4px_8px_rgba(245,158,11,0.8)]"></div>
         </div>
@@ -270,7 +270,7 @@
 
         <!-- Tombol Selesai & Kirim ke Google Sheet -->
         <div class="mt-6 pt-4 border-t border-slate-800/80 w-full flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span class="text-xs text-slate-500">Minimal selesaikan beberapa tantangan untuk mengklaim piagam penghargaan.</span>
+          <span class="text-xs text-slate-500">Kumpulkan poin sebanyak-banyaknya untuk meraih gelar Relawan Teladan.</span>
           <button onclick="finishSessionAndClaim()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs sm:text-sm shadow-lg shadow-red-950 transition-all flex items-center gap-2 border border-red-500/30">
             <i class="fa-solid fa-award"></i> Selesai & Ambil Piagam
           </button>
@@ -303,7 +303,7 @@
           <span id="timer-display" class="text-base font-black text-amber-400 font-mono">00:30</span>
         </div>
 
-        <!-- Area Interaksi (Pilihan Ganda Teori ATAU Tombol Selesai Aksi/Sanksi) -->
+        <!-- Area Interaksi -->
         <div id="modal-interactive-area" class="space-y-2.5 mb-4"></div>
 
         <!-- Feedback Edukatif -->
@@ -446,7 +446,7 @@
 
   <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
-    // URL Google Apps Script Anda yang Baru
+    // URL Google Apps Script Anda
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9nInev-kSlFg19bUiPOIbDLEj9UFVlaHyKCd8mO8Rt6ttiTuXYXNeFAuCN-cWfJeKGw/exec";
 
     let globalLeaderboardCache = [];
@@ -461,7 +461,7 @@
       counts: { green: 0, yellow: 0, red: 0 }
     };
 
-    // Segmen Roda (6 iris: Bergantian Hijau, Kuning, Merah)
+    // Segmen Roda (6 irisan: Bergantian Hijau, Kuning, Merah)
     const wheelSegments = [
       { colorKey: 'green', label: 'TEORI', bg: '#059669', text: '#ffffff' },
       { colorKey: 'yellow', label: 'AKSI', bg: '#d97706', text: '#ffffff' },
@@ -480,7 +480,7 @@
           points: 25,
           options: [
             { text: "Italia", isCorrect: true, exp: "Tepat! Perang di Solferino, Italia Utara, meninggalkan ribuan korban tanpa perawatan hingga menggerakkan hati Henry Dunant." },
-            { text: "Swiss", isCorrect: false, exp: "Salah! Swiss adalah tempat lahirnya Henry Dunant, namun pertempuran berlangsung di Solferino, Italia." },
+            { text: "Swiss", isCorrect: false, exp: "Salah! Swiss adalah tempat kelahiran Henry Dunant, namun medan pertempuran Solferino berada di Italia." },
             { text: "Prancis", isCorrect: false, exp: "Bukan, pertempuran Solferino terjadi di wilayah Italia Utara." }
           ]
         },
@@ -624,7 +624,7 @@
         ctx.strokeStyle = '#0f172a';
         ctx.stroke();
 
-        // Label Teks
+        // Label Teks Segmen
         ctx.save();
         ctx.fillStyle = seg.text;
         ctx.font = 'bold 15px "Plus Jakarta Sans", sans-serif';
@@ -636,7 +636,7 @@
       });
     }
 
-    // Putar Roda
+    // ================= FUNGSI PUTAR RODA (PERBAIKAN 100% PRESISI) =================
     function spinWheel() {
       if (isSpinning) return;
       isSpinning = true;
@@ -648,19 +648,14 @@
       sessionState.totalSpins++;
       document.getElementById('top-spins').innerText = sessionState.totalSpins;
 
-      // Suara detak berulang
+      // Efek suara detak putaran
       const tickTimer = setInterval(() => playTone('tick'), 160);
 
-      // Random Index (0 - 5)
-      const targetSegmentIndex = Math.floor(Math.random() * wheelSegments.length);
-      const arcDeg = 360 / wheelSegments.length;
+      // Putar minimal 5 putaran penuh (1800 deg) ditambah sudut acak (0 - 359 deg)
+      const randomExtraAngle = Math.floor(Math.random() * 360);
+      const totalSpinDegree = (5 * 360) + randomExtraAngle;
       
-      // Hitung derajat agar segmen berhenti tepat di jarum atas (270 derajat / jam 12)
-      const extraRounds = 5 * 360;
-      const segmentCenterDeg = (targetSegmentIndex * arcDeg) + (arcDeg / 2);
-      const targetRotation = extraRounds + (270 - segmentCenterDeg);
-
-      currentWheelAngle += targetRotation;
+      currentWheelAngle += totalSpinDegree;
       const canvas = document.getElementById('wheel-canvas');
       canvas.style.transform = `rotate(${currentWheelAngle}deg)`;
 
@@ -670,7 +665,16 @@
         btn.disabled = false;
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
 
-        const selectedSegment = wheelSegments[targetSegmentIndex];
+        // HITUNG POSISI TEPAT DI BAWAH JARUM PENUNJUK (Arah Jam 12 = 270 Derajat)
+        const normalizedAngle = (currentWheelAngle % 360);
+        const angleUnderPointer = (270 - normalizedAngle + 360) % 360;
+        
+        // Setiap segmen lebarnya 60 derajat (360 / 6)
+        const arcDeg = 360 / wheelSegments.length;
+        const winningIndex = Math.floor(angleUnderPointer / arcDeg);
+
+        const selectedSegment = wheelSegments[winningIndex];
+
         playTone('win');
         openCardModal(selectedSegment.colorKey);
       }, 4600);
@@ -704,7 +708,6 @@
       timerBox.classList.add('hidden');
       clearInterval(timerInterval);
 
-      // Reset styling border
       box.className = "bg-slate-900 border-2 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative overflow-hidden";
       interactArea.innerHTML = '';
 
