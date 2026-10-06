@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roda Kemanusiaan: Spin & Challenge PMR - SMPN 2 Pekuncen</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts: Plus Jakarta Sans & Cinzel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Cinzel"', 'serif'],
+          },
+          colors: {
+            pmi: {
+              red: '#DC2626',
+              dark: '#991B1B',
+              gold: '#F59E0B',
+              green: '#059669',
+              yellow: '#D97706'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Deselerasi Halus Roda Putar */
+    #wheel-canvas {
+      transition: transform 4.5s cubic-bezier(0.15, 0.95, 0.25, 1);
+    }
+
+    /* Cetak Piagam Resmi */
+    @media print {
+      body * { visibility: hidden; }
+      #certificate-wrap, #certificate-wrap * { visibility: visible; }
+      #certificate-wrap {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 24px;
+        box-shadow: none !important;
+        border: 5px double #991b1b !important;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-red-600 selection:text-white">
+
+  <!-- Header Navigasi -->
+  <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-xl">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-tr from-red-700 to-red-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-900/50 border border-red-400/30">
+          <i class="fa-solid fa-dharmachakra text-lg"></i>
+        </div>
+        <div>
+          <h1 class="font-black text-white tracking-wider text-sm sm:text-base flex items-center gap-2">
+            <span>RODA KEMANUSIAAN</span>
+            <span class="text-[10px] bg-red-600/30 text-red-400 border border-red-500/40 px-2 py-0.5 rounded-full font-bold">SPIN & CHALLENGE</span>
+          </h1>
+          <p class="text-xs text-red-400 font-extrabold tracking-wide">PMR MADYA SMP NEGERI 2 PEKUNCEN</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons & Stats -->
+      <div class="flex items-center gap-3">
+        <button onclick="openLeaderboardModal()" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+          <i class="fa-solid fa-trophy text-amber-400"></i>
+          <span class="hidden sm:inline">Peringkat Sekolah</span>
+          <span id="nav-count-badge" class="bg-amber-500 text-slate-950 text-[10px] px-1.5 py-0.2 rounded-full font-black">...</span>
+        </button>
+
+        <div id="top-bar-stats" class="hidden sm:flex items-center gap-4 bg-slate-800/80 px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold">
+          <div class="flex items-center gap-1.5 text-amber-400">
+            <i class="fa-solid fa-star"></i>
+            <span>Poin: <strong id="top-score" class="text-white text-sm font-black">0</strong></span>
+          </div>
+          <div class="w-1 h-3 bg-slate-700"></div>
+          <div class="flex items-center gap-1.5 text-red-400">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Putaran: <strong id="top-spins" class="text-white text-sm font-black">0</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Konten Utama -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-6 flex flex-col justify-center">
+
+    <!-- ================= 1. REGISTRASI RELAWAN ================= -->
+    <section id="screen-register" class="bg-slate-900/90 rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 max-w-lg mx-auto my-auto text-center relative overflow-hidden backdrop-blur-xl">
+      <div class="absolute -top-16 -right-16 w-48 h-48 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -left-16 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/70 border border-red-700/50 text-red-300 text-xs font-black mb-4 uppercase tracking-widest">
+          <i class="fa-solid fa-spinner fa-spin text-red-400"></i> Spin Wheel PMR Madya
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-black text-white mb-2 tracking-tight">Roda Uji Kemanusiaan</h2>
+        <p class="text-slate-400 text-xs sm:text-sm mb-6 leading-relaxed">
+          Putar roda keberuntungan dan selesaikan 3 jenis kartu tantangan: <strong class="text-emerald-400">Hijau (Teori)</strong>, <strong class="text-amber-400">Kuning (Aksi)</strong>, dan waspadai <strong class="text-rose-400">Merah (Sanksi)</strong>!
+        </p>
+
+        <form onsubmit="startSpinGame(event)" class="space-y-4 text-left bg-slate-950/60 p-5 rounded-2xl border border-slate-800">
+          <div>
+            <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">Nama Relawan / Siswa</label>
+            <input type="text" id="reg-name" required placeholder="Tulis nama lengkap Anda"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900 text-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-semibold placeholder:text-slate-600" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">Kelas</label>
+              <select id="reg-class" class="w-full px-3 py-2.5 rounded-xl border border-slate-700 bg-slate-900 text-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-semibold">
+                <option value="7A">Kelas 7A</option>
+                <option value="7B">Kelas 7B</option>
+                <option value="7C">Kelas 7C</option>
+                <option value="8A">Kelas 8A</option>
+                <option value="8B">Kelas 8B</option>
+                <option value="8C">Kelas 8C</option>
+                <option value="9A">Kelas 9A</option>
+                <option value="9B">Kelas 9B</option>
+                <option value="9C">Kelas 9C</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">Pilihan Regu</label>
+              <select id="reg-unit" class="w-full px-3 py-2.5 rounded-xl border border-slate-700 bg-slate-900 text-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-semibold">
+                <option value="Laskar Nagasasi">Laskar Nagasasi</option>
+                <option value="Rajawali Spendoe">Rajawali Spendoe</option>
+                <option value="Garuda Madya">Garuda Madya</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full mt-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-black py-3.5 px-6 rounded-xl shadow-lg shadow-red-950 transition-all flex items-center justify-center gap-2 group text-sm tracking-wide">
+            <span>Masuk ke Arena Roda</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </button>
+        </form>
+
+        <div class="mt-4 flex items-center justify-center gap-2">
+          <button type="button" onclick="openLeaderboardModal()" class="text-xs text-amber-400 hover:text-amber-300 font-bold underline underline-offset-4 flex items-center gap-1.5">
+            <i class="fa-solid fa-crown text-[11px]"></i> Lihat Papan Peringkat Real-Time
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 2. ARENA SPIN WHEEL & 3 KARTU ================= -->
+    <section id="screen-gameplay" class="hidden flex-col gap-6">
+      
+      <!-- Panel Profil Pemain & Rekap Cepat -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-md">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-600 to-red-800 border border-red-400/40 flex items-center justify-center text-white text-xl shadow-lg shadow-red-900/60">
+            <i class="fa-solid fa-user-ninja"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="player-hero-name" class="font-black text-white text-base">Nama Relawan</h3>
+              <span id="player-hero-unit" class="px-2 py-0.5 rounded-full bg-red-950 border border-red-700 text-red-300 text-[10px] font-black uppercase">Laskar Nagasasi</span>
+            </div>
+            <p class="text-xs text-slate-400 font-medium">Kelas <span id="player-hero-class" class="text-slate-200 font-bold">8A</span> • PMR Madya Spendoe</p>
+          </div>
+        </div>
+
+        <!-- Rekap Kartu yang Berhasil -->
+        <div class="flex items-center gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded-xl bg-emerald-950/70 border border-emerald-700 text-emerald-300 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-book"></i> <span id="count-green">0</span> Teori
+          </span>
+          <span class="px-2.5 py-1 rounded-xl bg-amber-950/70 border border-amber-700 text-amber-300 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-hand-fist"></i> <span id="count-yellow">0</span> Aksi
+          </span>
+          <span class="px-2.5 py-1 rounded-xl bg-rose-950/70 border border-rose-700 text-rose-300 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-triangle-exclamation"></i> <span id="count-red">0</span> Sanksi
+          </span>
+        </div>
+      </div>
+
+      <!-- Area 3 Pilihan Kartu Kategori -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <!-- Kartu Hijau: Teori -->
+        <div onclick="selectCategoryDirectly('green')" class="bg-gradient-to-br from-emerald-950/70 to-slate-900 border-2 border-emerald-500/50 hover:border-emerald-400 rounded-3xl p-4 cursor-pointer transition-all hover:scale-[1.02] shadow-xl flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xl shrink-0">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <h4 class="text-xs font-black uppercase tracking-wider text-emerald-300">Kartu Hijau</h4>
+            </div>
+            <p class="text-sm font-extrabold text-white">Teori & Wawasan</p>
+            <span class="text-[10px] text-emerald-400/90 font-bold">+25 Poin / Soal</span>
+          </div>
+        </div>
+
+        <!-- Kartu Kuning: Aksi -->
+        <div onclick="selectCategoryDirectly('yellow')" class="bg-gradient-to-br from-amber-950/70 to-slate-900 border-2 border-amber-500/50 hover:border-amber-400 rounded-3xl p-4 cursor-pointer transition-all hover:scale-[1.02] shadow-xl flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xl shrink-0">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <h4 class="text-xs font-black uppercase tracking-wider text-amber-300">Kartu Kuning</h4>
+            </div>
+            <p class="text-sm font-extrabold text-white">Aksi Praktik Lapangan</p>
+            <span class="text-[10px] text-amber-400/90 font-bold">+30 Poin (Dengan Timer)</span>
+          </div>
+        </div>
+
+        <!-- Kartu Merah: Sanksi -->
+        <div onclick="selectCategoryDirectly('red')" class="bg-gradient-to-br from-rose-950/70 to-slate-900 border-2 border-rose-500/50 hover:border-rose-400 rounded-3xl p-4 cursor-pointer transition-all hover:scale-[1.02] shadow-xl flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 text-xl shrink-0">
+            <i class="fa-solid fa-handcuffs"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+              <h4 class="text-xs font-black uppercase tracking-wider text-rose-300">Kartu Merah</h4>
+            </div>
+            <p class="text-sm font-extrabold text-white">Hukuman / Sanksi</p>
+            <span class="text-[10px] text-rose-400/90 font-bold">-10 Poin / Disiplin</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Area Roda Putar Roulette -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden backdrop-blur-md">
+        
+        <!-- Jarum Penunjuk Atas -->
+        <div class="z-20 -mb-5 flex flex-col items-center pointer-events-none">
+          <div class="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[26px] border-t-amber-400 drop-shadow-[0_4px_8px_rgba(245,158,11,0.8)]"></div>
+        </div>
+
+        <!-- Canvas Roda -->
+        <div class="relative w-[280px] h-[280px] sm:w-[320px] h-[320px] flex items-center justify-center">
+          <canvas id="wheel-canvas" width="320" height="320" class="rounded-full shadow-2xl border-4 border-slate-700"></canvas>
+          
+          <!-- Tombol Spin di Titik Tengah -->
+          <button id="btn-spin" onclick="spinWheel()" class="absolute w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-tr from-slate-900 to-slate-800 border-4 border-amber-400 text-amber-400 rounded-full font-black text-xs sm:text-sm shadow-2xl flex flex-col items-center justify-center hover:scale-105 active:scale-95 transition-transform z-10">
+            <i class="fa-solid fa-play text-sm sm:text-base mb-0.5"></i>
+            <span>PUTAR</span>
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-400 mt-6 font-medium text-center">
+          Tekan tombol <strong class="text-amber-400">PUTAR</strong> di tengah atau langsung klik salah satu kartu di atas untuk mengambil tantangan!
+        </p>
+
+        <!-- Tombol Selesai & Kirim ke Google Sheet -->
+        <div class="mt-6 pt-4 border-t border-slate-800/80 w-full flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span class="text-xs text-slate-500">Minimal selesaikan beberapa tantangan untuk mengklaim piagam penghargaan.</span>
+          <button onclick="finishSessionAndClaim()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs sm:text-sm shadow-lg shadow-red-950 transition-all flex items-center gap-2 border border-red-500/30">
+            <i class="fa-solid fa-award"></i> Selesai & Ambil Piagam
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= MODAL KARTU TANTANGAN ================= -->
+    <div id="modal-card" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+      <div id="card-inner-box" class="bg-slate-900 border rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl transform transition-all relative overflow-hidden">
+        
+        <!-- Header Kartu -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+          <div class="flex items-center gap-2">
+            <span id="modal-card-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider">Kategori</span>
+            <span id="modal-card-icon" class="text-xs"></span>
+          </div>
+          <span id="modal-card-points" class="text-xs font-black px-2.5 py-1 rounded-lg border">+25 Poin</span>
+        </div>
+
+        <h3 id="modal-card-title" class="text-base sm:text-lg font-black text-white mb-2">Judul Misi</h3>
+        <div id="modal-card-desc" class="text-slate-200 text-xs sm:text-sm leading-relaxed mb-5 bg-slate-950 p-4 rounded-2xl border border-slate-800 font-medium"></div>
+
+        <!-- Timer Khusus Kartu Kuning (Aksi) -->
+        <div id="timer-box" class="hidden mb-4 p-3 bg-amber-950/40 border border-amber-700/60 rounded-2xl items-center justify-between">
+          <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-stopwatch fa-spin text-amber-400"></i> Batas Waktu Praktik:
+          </span>
+          <span id="timer-display" class="text-base font-black text-amber-400 font-mono">00:30</span>
+        </div>
+
+        <!-- Area Interaksi (Pilihan Ganda Teori ATAU Tombol Selesai Aksi/Sanksi) -->
+        <div id="modal-interactive-area" class="space-y-2.5 mb-4"></div>
+
+        <!-- Feedback Edukatif -->
+        <div id="modal-feedback-box" class="hidden p-4 rounded-2xl border text-xs sm:text-sm leading-relaxed mb-4"></div>
+
+        <button id="modal-btn-close" onclick="closeCardModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-black py-3 rounded-xl text-xs sm:text-sm transition-all hidden border border-slate-700">
+          Lanjutkan Permainan
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ================= MODAL LEADERBOARD & RIWAYAT ================= -->
+    <div id="modal-leaderboard" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden items-center justify-center p-3 sm:p-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4 shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg">
+              <i class="fa-solid fa-trophy"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base sm:text-lg font-black text-white">Papan Peringkat Real-Time</h3>
+                <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Google Sheet Live
+                </span>
+              </div>
+              <p class="text-xs text-slate-400">PMR Madya SMP Negeri 2 Pekuncen</p>
+            </div>
+          </div>
+          <button onclick="closeLeaderboardModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Podium Juara 1, 2, 3 -->
+        <div id="podium-area" class="grid grid-cols-3 gap-2 mb-4 shrink-0"></div>
+
+        <!-- Tabel Daftar Siswa -->
+        <div class="flex-1 overflow-y-auto pr-1">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="sticky top-0 bg-slate-950 text-slate-400 font-black uppercase text-[10px] tracking-wider border-b border-slate-800">
+              <tr>
+                <th class="py-2.5 px-3">Peringkat</th>
+                <th class="py-2.5 px-3">Nama Relawan</th>
+                <th class="py-2.5 px-2">Kelas & Regu</th>
+                <th class="py-2.5 px-3 text-right">Skor</th>
+                <th class="py-2.5 px-3 text-right">Waktu</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-table-body" class="divide-y divide-slate-800/60 font-medium"></tbody>
+          </table>
+        </div>
+
+        <div class="border-t border-slate-800 pt-4 mt-3 flex items-center justify-between shrink-0 text-xs">
+          <button onclick="refreshLeaderboardData()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-3 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i> Refresh Data
+          </button>
+          <button onclick="closeLeaderboardModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-1.5 rounded-xl transition-all">
+            Tutup
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= 3. PIAGAM PENGHARGAAN KELULUSAN ================= -->
+    <section id="screen-cert" class="hidden flex-col gap-6 max-w-3xl mx-auto w-full my-auto">
+      <div id="certificate-wrap" class="bg-white text-slate-900 border-8 border-double border-red-800 rounded-3xl p-6 sm:p-10 shadow-2xl text-center relative overflow-hidden">
+        <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+          <i class="fa-solid fa-plus text-[260px] text-red-800"></i>
+        </div>
+
+        <div class="border-b-2 border-slate-300 pb-4 mb-6">
+          <div class="w-12 h-12 mx-auto bg-red-700 rounded-full flex items-center justify-center text-white text-xl font-black mb-2 shadow-md">
+            <i class="fa-solid fa-plus"></i>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-wider uppercase font-serif">PALANG MERAH REMAJA (PMR) MADYA</h2>
+          <h3 class="text-xs sm:text-sm font-black text-red-700 uppercase tracking-widest">SMP NEGERI 2 PEKUNCEN - BANYUMAS</h3>
+          <p class="text-[11px] text-slate-500 mt-1 italic font-medium">Piagam Penghargaan Uji Roda Kemanusiaan 2026</p>
+        </div>
+
+        <div class="my-6 space-y-3">
+          <p class="text-xs uppercase font-extrabold tracking-widest text-slate-400">Diberikan secara terhormat kepada:</p>
+          <h4 id="cert-hero-name" class="text-2xl sm:text-3xl font-black text-slate-900 underline decoration-red-600 underline-offset-8">
+            Nama Relawan
+          </h4>
+          <p class="text-sm font-semibold text-slate-700">
+            Kelas: <span id="cert-hero-class" class="font-black text-slate-900">8A</span> | Regu: <span id="cert-hero-unit" class="font-black text-red-700">Laskar Nagasasi</span>
+          </p>
+
+          <p class="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed pt-2">
+            Telah menyelesaikan sesi tantangan <strong>Roda Kemanusiaan: Spin & Challenge</strong> yang mencakup uji wawasan teori, demonstrasi aksi pertolongan pertama, dan kedisiplinan relawan:
+          </p>
+
+          <div class="inline-block bg-red-50 border-2 border-red-500 px-6 py-2.5 rounded-2xl mt-2">
+            <span id="cert-rank-badge" class="text-base sm:text-lg font-black text-red-700 uppercase tracking-wider block font-serif">RELAVAN TANGGAP & TANGGUH</span>
+            <span class="text-xs text-slate-600 font-bold">Total Poin: <strong id="cert-final-score" class="text-slate-900">0</strong> Poin | Peringkat Sekolah: <strong id="cert-rank-pos" class="text-amber-600">Menghubungkan...</strong></span>
+          </div>
+
+          <p id="cert-sync-status" class="text-[10px] text-emerald-600 font-bold flex items-center justify-center gap-1 mt-1">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Nilai otomatis tersinkronisasi ke Google Sheet Pembina
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 pt-6 border-t border-slate-200 text-xs text-slate-600 mt-6">
+          <div>
+            <p class="font-medium">Pembina PMR Madya</p>
+            <div class="h-10 flex items-center justify-center font-serif text-slate-400 italic text-sm">[ Terverifikasi Sistem ]</div>
+            <p class="font-bold text-slate-800">SMP Negeri 2 Pekuncen</p>
+          </div>
+          <div>
+            <p class="font-medium">Semboyan Palang Merah</p>
+            <div class="h-10 flex items-center justify-center font-black text-red-700 text-xs sm:text-sm uppercase font-serif">"Inter Arma Caritas"</div>
+            <p class="text-slate-400 text-[11px]" id="cert-stamp-date">Pekuncen, 2026</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 no-print">
+        <button onclick="window.print()" class="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-900 font-black py-3 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+          <i class="fa-solid fa-print text-red-600"></i> Cetak / Simpan PDF
+        </button>
+        <button onclick="openLeaderboardModal()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+          <i class="fa-solid fa-trophy"></i> Peringkat Sekolah
+        </button>
+        <button onclick="restartSession()" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-black py-3 px-6 rounded-xl shadow-lg shadow-red-950 transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+          <i class="fa-solid fa-arrow-rotate-right"></i> Main Lagi
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-950 border-t border-slate-900 py-3 text-center text-xs text-slate-500 no-print">
+    <p>&copy; Media Game Edukasi PMR Madya SMP Negeri 2 Pekuncen &bull; Siap Vercel Deployment</p>
+  </footer>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    // URL Google Apps Script Anda yang Baru
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9nInev-kSlFg19bUiPOIbDLEj9UFVlaHyKCd8mO8Rt6ttiTuXYXNeFAuCN-cWfJeKGw/exec";
+
+    let globalLeaderboardCache = [];
+    let isSpinning = false;
+    let currentWheelAngle = 0;
+    let timerInterval = null;
+
+    const sessionState = {
+      hero: { name: '', class: '', unit: '' },
+      score: 0,
+      totalSpins: 0,
+      counts: { green: 0, yellow: 0, red: 0 }
+    };
+
+    // Segmen Roda (6 iris: Bergantian Hijau, Kuning, Merah)
+    const wheelSegments = [
+      { colorKey: 'green', label: 'TEORI', bg: '#059669', text: '#ffffff' },
+      { colorKey: 'yellow', label: 'AKSI', bg: '#d97706', text: '#ffffff' },
+      { colorKey: 'red', label: 'SANKSI', bg: '#dc2626', text: '#ffffff' },
+      { colorKey: 'green', label: 'TEORI', bg: '#059669', text: '#ffffff' },
+      { colorKey: 'yellow', label: 'AKSI', bg: '#d97706', text: '#ffffff' },
+      { colorKey: 'red', label: 'SANKSI', bg: '#dc2626', text: '#ffffff' }
+    ];
+
+    // Database 3 Kartu Tematik
+    const challengeDatabase = {
+      green: [
+        {
+          title: "Sejarah Kepalanganmerahan",
+          q: "Pertempuran Solferino pada tahun 1859 yang mengilhami Jean Henry Dunant mendirikan Palang Merah terjadi di negara:",
+          points: 25,
+          options: [
+            { text: "Italia", isCorrect: true, exp: "Tepat! Perang di Solferino, Italia Utara, meninggalkan ribuan korban tanpa perawatan hingga menggerakkan hati Henry Dunant." },
+            { text: "Swiss", isCorrect: false, exp: "Salah! Swiss adalah tempat lahirnya Henry Dunant, namun pertempuran berlangsung di Solferino, Italia." },
+            { text: "Prancis", isCorrect: false, exp: "Bukan, pertempuran Solferino terjadi di wilayah Italia Utara." }
+          ]
+        },
+        {
+          title: "Prinsip Kesamaan (Impartiality)",
+          q: "Apa inti pengamalan Prinsip 'Kesamaan' bagi relawan PMR saat menolong korban?",
+          points: 25,
+          options: [
+            { text: "Memberikan bantuan murni berdasarkan tingkat keparahan cedera tanpa diskriminasi", isCorrect: true, exp: "Benar! Bantuan diberikan atas dasar kebutuhan medis tanpa membedakan suku, agama, atau status." },
+            { text: "Membagi jumlah perban sama rata kepada semua orang meskipun lukanya ringan", isCorrect: false, exp: "Salah! Prioritas pertolongan ditentukan oleh kegawatdaruratan korban." }
+          ]
+        },
+        {
+          title: "Protokol Penanganan Syok / Pingsan",
+          q: "Mengapa korban pingsan saat upacara bendera harus ditinggikan tungkai kakinya 15-30 cm?",
+          points: 25,
+          options: [
+            { text: "Untuk melancarkan kembali aliran darah dan pasokan oksigen menuju otak", isCorrect: true, exp: "Sempurna! Posisi syok mempercepat pemulihan kesadaran korban." },
+            { text: "Agar sepatu dan kaos kakinya cepat kering dari keringat", isCorrect: false, exp: "Bukan alasan medis penanganan pingsan." }
+          ]
+        },
+        {
+          title: "Donor Darah Remaja (DDS)",
+          q: "Berapa batas usia minimal yang disyaratkan oleh PMI untuk dapat mendonorkan darah secara sukarela?",
+          points: 25,
+          options: [
+            { text: "17 Tahun", isCorrect: true, exp: "Tepat! Usia minimal donor darah adalah 17 tahun, peran PMR Madya adalah sebagai Peer Educator." },
+            { text: "12 Tahun", isCorrect: false, exp: "Terlalu muda dan belum memenuhi standar medis donor darah." }
+          ]
+        }
+      ],
+      yellow: [
+        {
+          title: "Aksi Posisi Syok Terlentang",
+          desc: "Peragakan posisi tungkai kaki terangkat 15-30 cm pada salah satu teman atau bangku di hadapan kawan sekelasmu!",
+          timeLimit: 25,
+          points: 30
+        },
+        {
+          title: "Aksi Simulasi Penanganan Mimisan",
+          desc: "Tunjukkan posisi duduk menunduk sedikit ke depan dan cara menekan cuping hidung yang benar sambil bernapas melalui mulut!",
+          timeLimit: 20,
+          points: 30
+        },
+        {
+          title: "Aksi Cuci Tangan 6 Langkah WHO",
+          desc: "Demonstrasikan secara cepat dan benar gerakan 6 langkah mencuci tangan memakai sabun standar kesehatan!",
+          timeLimit: 30,
+          points: 30
+        },
+        {
+          title: "Aksi Sebutkan 5 Alat Wajib P3K",
+          desc: "Sebutkan dengan lantang 5 peralatan esensial yang wajib ada di dalam tas P3K lapangan PMR Madya!",
+          timeLimit: 15,
+          points: 30
+        }
+      ],
+      red: [
+        {
+          title: "Sanksi Kebugaran Relawan",
+          desc: "Lakukan 10 kali Jumping Jack atau Push-up relawan di depan teman-temanmu agar fisik tetap bugar siap siaga!",
+          penalty: 10
+        },
+        {
+          title: "Sanksi Klarifikasi Mitos Odol",
+          desc: "Jelaskan dengan suara lantang kepada kelas mengapa mengoleskan odol/pasta gigi pada luka bakar adalah tindakan yang berbahaya!",
+          penalty: 10
+        },
+        {
+          title: "Sanksi Hafalan Terbalik",
+          desc: "Sebutkan ke-7 Prinsip Palang Merah secara urut mulai dari prinsip terakhir (Kesemestaan) hingga pertama (Kemanusiaan)!",
+          penalty: 10
+        },
+        {
+          title: "Sanksi Piket Spendoe",
+          desc: "Berjanji merapikan kotak obat dan tandu di ruang UKS SMPN 2 Pekuncen setelah jam istirahat hari ini!",
+          penalty: 10
+        }
+      ]
+    };
+
+    // Audio Synthesizer (Web Audio API)
+    function playTone(type) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'tick') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(240, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.05);
+        } else if (type === 'win') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+          osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
+          gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.35);
+        } else if (type === 'lose') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(160, audioCtx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.3);
+        }
+      } catch (err) {}
+    }
+
+    // Menggambar Roda Roulette di Canvas
+    function drawWheel() {
+      const canvas = document.getElementById('wheel-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const numSegments = wheelSegments.length;
+      const arcSize = (2 * Math.PI) / numSegments;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = centerX - 8;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      wheelSegments.forEach((seg, i) => {
+        const angle = i * arcSize;
+        ctx.beginPath();
+        ctx.fillStyle = seg.bg;
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, angle, angle + arcSize);
+        ctx.lineTo(centerX, centerY);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#0f172a';
+        ctx.stroke();
+
+        // Label Teks
+        ctx.save();
+        ctx.fillStyle = seg.text;
+        ctx.font = 'bold 15px "Plus Jakarta Sans", sans-serif';
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle + arcSize / 2);
+        ctx.textAlign = 'right';
+        ctx.fillText(seg.label, radius - 24, 6);
+        ctx.restore();
+      });
+    }
+
+    // Putar Roda
+    function spinWheel() {
+      if (isSpinning) return;
+      isSpinning = true;
+
+      const btn = document.getElementById('btn-spin');
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      sessionState.totalSpins++;
+      document.getElementById('top-spins').innerText = sessionState.totalSpins;
+
+      // Suara detak berulang
+      const tickTimer = setInterval(() => playTone('tick'), 160);
+
+      // Random Index (0 - 5)
+      const targetSegmentIndex = Math.floor(Math.random() * wheelSegments.length);
+      const arcDeg = 360 / wheelSegments.length;
+      
+      // Hitung derajat agar segmen berhenti tepat di jarum atas (270 derajat / jam 12)
+      const extraRounds = 5 * 360;
+      const segmentCenterDeg = (targetSegmentIndex * arcDeg) + (arcDeg / 2);
+      const targetRotation = extraRounds + (270 - segmentCenterDeg);
+
+      currentWheelAngle += targetRotation;
+      const canvas = document.getElementById('wheel-canvas');
+      canvas.style.transform = `rotate(${currentWheelAngle}deg)`;
+
+      setTimeout(() => {
+        clearInterval(tickTimer);
+        isSpinning = false;
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+        const selectedSegment = wheelSegments[targetSegmentIndex];
+        playTone('win');
+        openCardModal(selectedSegment.colorKey);
+      }, 4600);
+    }
+
+    // Klik Langsung Kartu Atas
+    function selectCategoryDirectly(colorKey) {
+      if (isSpinning) return;
+      playTone('tick');
+      openCardModal(colorKey);
+    }
+
+    // Buka Modal Tantangan Kartu
+    function openCardModal(colorKey) {
+      const modal = document.getElementById('modal-card');
+      const box = document.getElementById('card-inner-box');
+      const badge = document.getElementById('modal-card-badge');
+      const icon = document.getElementById('modal-card-icon');
+      const points = document.getElementById('modal-card-points');
+      const title = document.getElementById('modal-card-title');
+      const desc = document.getElementById('modal-card-desc');
+      const timerBox = document.getElementById('timer-box');
+      const interactArea = document.getElementById('modal-interactive-area');
+      const feedbackBox = document.getElementById('modal-feedback-box');
+      const closeBtn = document.getElementById('modal-btn-close');
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      feedbackBox.classList.add('hidden');
+      closeBtn.classList.add('hidden');
+      timerBox.classList.add('hidden');
+      clearInterval(timerInterval);
+
+      // Reset styling border
+      box.className = "bg-slate-900 border-2 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative overflow-hidden";
+      interactArea.innerHTML = '';
+
+      if (colorKey === 'green') {
+        // KARTU HIJAU: TEORI
+        box.classList.add('border-emerald-500');
+        badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-950 text-emerald-400 border border-emerald-700";
+        badge.innerText = "Kartu Hijau: Teori";
+        icon.className = "fa-solid fa-book text-emerald-400";
+        points.className = "text-xs font-black text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800";
+        points.innerText = "+25 Poin";
+
+        const list = challengeDatabase.green;
+        const task = list[Math.floor(Math.random() * list.length)];
+        title.innerText = task.title;
+        desc.innerText = task.q;
+
+        task.options.forEach((opt, idx) => {
+          const b = document.createElement('button');
+          b.className = "w-full text-left p-3.5 rounded-xl border border-slate-800 hover:border-emerald-500 hover:bg-slate-800 text-xs sm:text-sm font-semibold transition-all flex items-start gap-3 bg-slate-950/60";
+          b.innerHTML = `
+            <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-black text-slate-300 shrink-0 mt-0.5">${String.fromCharCode(65 + idx)}</span>
+            <span class="text-slate-200 leading-snug">${opt.text}</span>
+          `;
+          b.onclick = () => submitTheoryAnswer(opt, b, task);
+          interactArea.appendChild(b);
+        });
+
+      } else if (colorKey === 'yellow') {
+        // KARTU KUNING: AKSI PRAKTIK
+        box.classList.add('border-amber-500');
+        badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-950 text-amber-400 border border-amber-700";
+        badge.innerText = "Kartu Kuning: Aksi Praktik";
+        icon.className = "fa-solid fa-bolt text-amber-400";
+        points.className = "text-xs font-black text-amber-400 bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-800";
+        points.innerText = "+30 Poin";
+
+        const list = challengeDatabase.yellow;
+        const task = list[Math.floor(Math.random() * list.length)];
+        title.innerText = task.title;
+        desc.innerText = task.desc;
+
+        timerBox.classList.remove('hidden');
+        timerBox.classList.add('flex');
+        let timeLeft = task.timeLimit;
+        document.getElementById('timer-display').innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          document.getElementById('timer-display').innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            playTone('tick');
+          }
+        }, 1000);
+
+        const btnDone = document.createElement('button');
+        btnDone.className = "w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 rounded-xl text-xs sm:text-sm transition-all shadow-lg flex items-center justify-center gap-2";
+        btnDone.innerHTML = `<i class="fa-solid fa-check"></i> Selesai Memperagakan Aksi`;
+        btnDone.onclick = () => {
+          clearInterval(timerInterval);
+          sessionState.score += task.points;
+          sessionState.counts.yellow++;
+          playTone('win');
+          updateHeaderStats();
+          feedbackBox.className = "p-4 rounded-2xl border border-amber-700 bg-amber-950/60 text-amber-200 text-xs sm:text-sm";
+          feedbackBox.innerHTML = `<strong>Aksi Berhasil!</strong> Kamu berhasil menyelesaikan demonstrasi praktik lapangan (+30 Poin).`;
+          feedbackBox.classList.remove('hidden');
+          btnDone.disabled = true;
+          btnDone.classList.add('opacity-50');
+          closeBtn.classList.remove('hidden');
+        };
+        interactArea.appendChild(btnDone);
+
+      } else if (colorKey === 'red') {
+        // KARTU MERAH: SANKSI / HUKUMAN
+        box.classList.add('border-rose-500');
+        badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-950 text-rose-400 border border-rose-700";
+        badge.innerText = "Kartu Merah: Hukuman";
+        icon.className = "fa-solid fa-triangle-exclamation text-rose-400";
+        points.className = "text-xs font-black text-rose-400 bg-rose-950/60 px-2.5 py-1 rounded-lg border border-rose-800";
+        points.innerText = "-10 Poin";
+
+        const list = challengeDatabase.red;
+        const task = list[Math.floor(Math.random() * list.length)];
+        title.innerText = task.title;
+        desc.innerText = task.desc;
+
+        const btnConfirm = document.createElement('button');
+        btnConfirm.className = "w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-3 rounded-xl text-xs sm:text-sm transition-all shadow-lg flex items-center justify-center gap-2";
+        btnConfirm.innerHTML = `<i class="fa-solid fa-hand"></i> Saya Siap Melaksanakan Sanksi`;
+        btnConfirm.onclick = () => {
+          sessionState.score = Math.max(0, sessionState.score - task.penalty);
+          sessionState.counts.red++;
+          playTone('lose');
+          updateHeaderStats();
+          feedbackBox.className = "p-4 rounded-2xl border border-rose-700 bg-rose-950/60 text-rose-200 text-xs sm:text-sm";
+          feedbackBox.innerHTML = `<strong>Sanksi Diterima:</strong> Kedisiplinan adalah pilar utama relawan kemanusiaan (-10 Poin).`;
+          feedbackBox.classList.remove('hidden');
+          btnConfirm.disabled = true;
+          btnConfirm.classList.add('opacity-50');
+          closeBtn.classList.remove('hidden');
+        };
+        interactArea.appendChild(btnConfirm);
+      }
+    }
+
+    function submitTheoryAnswer(opt, btn, task) {
+      const allBtns = document.getElementById('modal-interactive-area').querySelectorAll('button');
+      allBtns.forEach(b => b.disabled = true);
+
+      const feedbackBox = document.getElementById('modal-feedback-box');
+      feedbackBox.classList.remove('hidden');
+
+      if (opt.isCorrect) {
+        playTone('win');
+        sessionState.score += task.points;
+        sessionState.counts.green++;
+        btn.classList.add('border-emerald-500', 'bg-emerald-950/40');
+        feedbackBox.className = "p-4 rounded-2xl border border-emerald-800 bg-emerald-950/60 text-emerald-200 text-xs sm:text-sm";
+        feedbackBox.innerHTML = `<strong>Jawaban Benar!</strong> ${opt.exp}`;
+      } else {
+        playTone('lose');
+        btn.classList.add('border-rose-500', 'bg-rose-950/40');
+        feedbackBox.className = "p-4 rounded-2xl border border-rose-800 bg-rose-950/60 text-rose-200 text-xs sm:text-sm";
+        feedbackBox.innerHTML = `<strong>Catatan Pembelajaran:</strong> ${opt.exp}`;
+      }
+
+      updateHeaderStats();
+      document.getElementById('modal-btn-close').classList.remove('hidden');
+    }
+
+    function closeCardModal() {
+      clearInterval(timerInterval);
+      document.getElementById('modal-card').classList.add('hidden');
+      document.getElementById('modal-card').classList.remove('flex');
+    }
+
+    function updateHeaderStats() {
+      document.getElementById('top-score').innerText = sessionState.score;
+      document.getElementById('count-green').innerText = sessionState.counts.green;
+      document.getElementById('count-yellow').innerText = sessionState.counts.yellow;
+      document.getElementById('count-red').innerText = sessionState.counts.red;
+    }
+
+    // ================= INTEGRASI GOOGLE APPS SCRIPT =================
+    async function fetchOnlineLeaderboard() {
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          globalLeaderboardCache = data;
+          updateLeaderboardBadge(data.length);
+          return data;
+        }
+        return [];
+      } catch (e) {
+        console.warn("Offline atau fallback:", e);
+        return globalLeaderboardCache;
+      }
+    }
+
+    async function sendScoreToGoogleSheet(payload) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        console.log("Skor berhasil terkirim ke Google Sheet");
+      } catch (err) {
+        console.error("Gagal kirim online:", err);
+      }
+    }
+
+    function updateLeaderboardBadge(count) {
+      const badge = document.getElementById('nav-count-badge');
+      if (badge) badge.innerText = count !== undefined ? count : globalLeaderboardCache.length;
+    }
+
+    async function openLeaderboardModal() {
+      const modal = document.getElementById('modal-leaderboard');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      renderLeaderboardUI(globalLeaderboardCache);
+      await refreshLeaderboardData();
+    }
+
+    function closeLeaderboardModal() {
+      const modal = document.getElementById('modal-leaderboard');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function refreshLeaderboardData() {
+      const icon = document.getElementById('refresh-icon');
+      if (icon) icon.classList.add('fa-spin');
+      const fresh = await fetchOnlineLeaderboard();
+      renderLeaderboardUI(fresh);
+      if (icon) icon.classList.remove('fa-spin');
+    }
+
+    function renderLeaderboardUI(list) {
+      const podium = document.getElementById('podium-area');
+      const tbody = document.getElementById('leaderboard-table-body');
+      podium.innerHTML = '';
+      tbody.innerHTML = '';
+
+      if (!list || list.length === 0) {
+        podium.innerHTML = `<div class="col-span-3 text-center py-4 text-slate-500 text-xs italic">Belum ada data relawan tersimpan di Google Sheet.</div>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs italic">Data masih kosong...</td></tr>`;
+        return;
+      }
+
+      const top3 = [list[1] || null, list[0] || null, list[2] || null];
+      const conf = [
+        { rank: 2, crown: 'text-slate-300', bg: 'bg-slate-800/80 border-slate-700', label: 'Juara 2' },
+        { rank: 1, crown: 'text-amber-400', bg: 'bg-amber-950/40 border-amber-600/50', label: 'Juara 1' },
+        { rank: 3, crown: 'text-amber-600', bg: 'bg-slate-800/80 border-slate-700', label: 'Juara 3' }
+      ];
+
+      conf.forEach((cfg, idx) => {
+        const item = top3[idx];
+        const col = document.createElement('div');
+        col.className = `flex flex-col items-center justify-end text-center p-2 rounded-2xl border ${cfg.bg}`;
+        if (item) {
+          col.innerHTML = `
+            <i class="fa-solid fa-crown ${cfg.crown} text-sm mb-1"></i>
+            <span class="text-[10px] font-black uppercase text-slate-400 leading-none">${cfg.label}</span>
+            <h5 class="text-xs font-black text-white truncate max-w-[90px] mt-0.5">${item.name}</h5>
+            <span class="text-[10px] text-amber-400 font-extrabold">${item.score} Pts</span>
+            <span class="text-[9px] text-slate-500">${item.class}</span>
+          `;
+        } else {
+          col.innerHTML = `<span class="text-[10px] font-bold text-slate-600">${cfg.label}</span><span class="text-[10px] text-slate-600 italic">Kosong</span>`;
+        }
+        podium.appendChild(col);
+      });
+
+      list.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/40 transition-colors";
+        let rankBadge = `<span class="font-bold text-slate-400">#${idx + 1}</span>`;
+        if (idx === 0) rankBadge = `<span class="text-amber-400 font-black"><i class="fa-solid fa-medal mr-1"></i>#1</span>`;
+        if (idx === 1) rankBadge = `<span class="text-slate-300 font-black"><i class="fa-solid fa-medal mr-1"></i>#2</span>`;
+        if (idx === 2) rankBadge = `<span class="text-amber-600 font-black"><i class="fa-solid fa-medal mr-1"></i>#3</span>`;
+
+        let formattedDate = "-";
+        if (item.timestamp) {
+          const d = new Date(item.timestamp);
+          formattedDate = isNaN(d) ? item.timestamp : d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+        }
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 whitespace-nowrap">${rankBadge}</td>
+          <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap">${item.name}</td>
+          <td class="py-2.5 px-2 text-slate-400 whitespace-nowrap">
+            <span class="text-slate-300 font-bold">${item.class}</span> &bull; <span class="text-[11px]">${item.unit}</span>
+          </td>
+          <td class="py-2.5 px-3 text-right font-black text-amber-400 whitespace-nowrap">${item.score} Pts</td>
+          <td class="py-2.5 px-3 text-right text-slate-500 text-[10px] whitespace-nowrap">${formattedDate}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Mulai Game
+    function startSpinGame(e) {
+      e.preventDefault();
+      sessionState.hero.name = document.getElementById('reg-name').value.trim();
+      sessionState.hero.class = document.getElementById('reg-class').value;
+      sessionState.hero.unit = document.getElementById('reg-unit').value;
+
+      document.getElementById('screen-register').classList.add('hidden');
+      document.getElementById('screen-gameplay').classList.remove('hidden');
+      document.getElementById('screen-gameplay').classList.add('flex');
+      document.getElementById('top-bar-stats').classList.remove('hidden');
+
+      document.getElementById('player-hero-name').innerText = sessionState.hero.name;
+      document.getElementById('player-hero-class').innerText = sessionState.hero.class;
+      document.getElementById('player-hero-unit').innerText = sessionState.hero.unit;
+      document.getElementById('top-score').innerText = sessionState.score;
+
+      drawWheel();
+    }
+
+    // Selesai & Klaim Piagam
+    async function finishSessionAndClaim() {
+      let rankTitle = "KADER RELAWAN MUDA BERPOTENSI";
+      if (sessionState.score >= 120) {
+        rankTitle = "KOMANDAN MUDA RELAWAN TELADAN";
+      } else if (sessionState.score >= 70) {
+        rankTitle = "RELAWAN TANGGAP & TANGGUH";
+      }
+
+      const payload = {
+        name: sessionState.hero.name || "Relawan Spendoe",
+        class: sessionState.hero.class,
+        unit: sessionState.hero.unit,
+        score: sessionState.score,
+        rankTitle: rankTitle
+      };
+
+      document.getElementById('screen-gameplay').classList.add('hidden');
+      document.getElementById('screen-cert').classList.remove('hidden');
+      document.getElementById('screen-cert').classList.add('flex');
+
+      document.getElementById('cert-hero-name').innerText = payload.name;
+      document.getElementById('cert-hero-class').innerText = payload.class;
+      document.getElementById('cert-hero-unit').innerText = payload.unit;
+      document.getElementById('cert-final-score').innerText = payload.score;
+      document.getElementById('cert-rank-badge').innerText = rankTitle;
+
+      const now = new Date();
+      const optionsDate = { day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('cert-stamp-date').innerText = `Pekuncen, ${now.toLocaleDateString('id-ID', optionsDate)}`;
+
+      // Kirim Nilai ke Google Sheet
+      sendScoreToGoogleSheet(payload);
+
+      // Hitung Peringkat Terkini
+      setTimeout(async () => {
+        const freshList = await fetchOnlineLeaderboard();
+        const idx = freshList.findIndex(item => item.name === payload.name && Number(item.score) === payload.score);
+        if (idx !== -1) {
+          document.getElementById('cert-rank-pos').innerText = `#${idx + 1} dari ${freshList.length} Siswa`;
+        } else {
+          document.getElementById('cert-rank-pos').innerText = `Tercatat di Server`;
+        }
+      }, 1500);
+    }
+
+    function restartSession() {
+      sessionState.score = 0;
+      sessionState.totalSpins = 0;
+      sessionState.counts = { green: 0, yellow: 0, red: 0 };
+      updateHeaderStats();
+      document.getElementById('top-spins').innerText = 0;
+
+      document.getElementById('screen-cert').classList.add('hidden');
+      document.getElementById('screen-register').classList.remove('hidden');
+      document.getElementById('top-bar-stats').classList.add('hidden');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      drawWheel();
+      fetchOnlineLeaderboard();
+    });
+  </script>
+</body>
+</html>
