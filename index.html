@@ -80,7 +80,7 @@
 
       <!-- Action Buttons & Stats -->
       <div class="flex items-center gap-3">
-        <button onclick="openLeaderboardModal()" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+        <button type="button" onclick="openLeaderboardModal()" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer z-50">
           <i class="fa-solid fa-trophy text-amber-400"></i>
           <span class="hidden sm:inline">Peringkat Sekolah</span>
           <span id="nav-count-badge" class="bg-amber-500 text-slate-950 text-[10px] px-1.5 py-0.2 rounded-full font-black">...</span>
@@ -172,14 +172,15 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full mt-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-black py-3.5 px-6 rounded-xl shadow-lg shadow-red-950 transition-all flex items-center justify-center gap-2 group text-sm tracking-wide">
+          <button type="submit" class="w-full mt-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-black py-3.5 px-6 rounded-xl shadow-lg shadow-red-950 transition-all flex items-center justify-center gap-2 group text-sm tracking-wide cursor-pointer">
             <span>Masuk ke Arena Roda</span>
             <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
           </button>
         </form>
 
-        <div class="mt-4 flex items-center justify-center gap-2">
-          <button type="button" onclick="openLeaderboardModal()" class="text-xs text-amber-400 hover:text-amber-300 font-bold underline underline-offset-4 flex items-center gap-1.5">
+        <!-- Tombol Papan Peringkat Real-Time -->
+        <div class="mt-5 flex items-center justify-center">
+          <button type="button" onclick="openLeaderboardModal()" class="text-xs text-amber-400 hover:text-amber-300 font-bold underline underline-offset-4 flex items-center gap-1.5 cursor-pointer py-1 px-3 rounded-lg hover:bg-slate-800/60 transition-all">
             <i class="fa-solid fa-crown text-[11px]"></i> Lihat Papan Peringkat Real-Time
           </button>
         </div>
@@ -190,4 +191,157 @@
     <section id="screen-gameplay" class="hidden flex-col gap-6">
       
       <!-- Panel Profil Pemain & Rekap Cepat -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-md">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-600 to-red-800 border border-red-400/40 flex items-center justify-center text-white text-xl shadow-lg shadow-red-900/60">
+            <i class="fa-solid fa-user-ninja"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="player-hero-name" class="font-black text-white text-base">Nama Relawan</h3>
+              <span id="player-hero-unit" class="px-2 py-0.5 rounded-full bg-red-950 border border-red-700 text-red-300 text-[10px] font-black uppercase">Laskar Nagasasi</span>
+            </div>
+            <p class="text-xs text-slate-400 font-medium">Kelas <span id="player-hero-class" class="text-slate-200 font-bold">8A</span> • PMR Madya Spendoe</p>
+          </div>
+        </div>
+
+        <!-- Rekap Kartu yang Berhasil -->
+        <div class="flex items-center gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded-xl bg-emerald-950/70 border border-emerald-700 text-emerald-300 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-book"></i> <span id="count-green">0</span> Teori
+          </span>
+          <span class="px-2.5 py-1 rounded-xl bg-amber-950/70 border border-amber-700 text-amber-300 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-hand-fist"></i> <span id="count-yellow">0</span> Aksi
+          </span>
+          <span class="px-2.5 py-1 rounded-xl bg-rose-950/70 border border-rose-700 text-rose-300 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-triangle-exclamation"></i> <span id="count-red">0</span> Sanksi
+          </span>
+        </div>
+      </div>
+
+      <!-- Area 3 Pilihan Kartu Kategori -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <!-- Kartu Hijau: Teori -->
+        <div onclick="selectCategoryDirectly('green')" class="bg-gradient-to-br from-emerald-950/70 to-slate-900 border-2 border-emerald-500/50 hover:border-emerald-400 rounded-3xl p-4 cursor-pointer transition-all hover:scale-[1.02] shadow-xl flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xl shrink-0">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <h4 class="text-xs font-black uppercase tracking-wider text-emerald-300">Kartu Hijau</h4>
+            </div>
+            <p class="text-sm font-extrabold text-white">Teori & Wawasan</p>
+            <span class="text-[10px] text-emerald-400/90 font-bold">+25 Poin / Soal</span>
+          </div>
+        </div>
+
+        <!-- Kartu Kuning: Aksi -->
+        <div onclick="selectCategoryDirectly('yellow')" class="bg-gradient-to-br from-amber-950/70 to-slate-900 border-2 border-amber-500/50 hover:border-amber-400 rounded-3xl p-4 cursor-pointer transition-all hover:scale-[1.02] shadow-xl flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xl shrink-0">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <h4 class="text-xs font-black uppercase tracking-wider text-amber-300">Kartu Kuning</h4>
+            </div>
+            <p class="text-sm font-extrabold text-white">Aksi Praktik Lapangan</p>
+            <span class="text-[10px] text-amber-400/90 font-bold">+30 Poin (Dengan Timer)</span>
+          </div>
+        </div>
+
+        <!-- Kartu Merah: Sanksi -->
+        <div onclick="selectCategoryDirectly('red')" class="bg-gradient-to-br from-rose-950/70 to-slate-900 border-2 border-rose-500/50 hover:border-rose-400 rounded-3xl p-4 cursor-pointer transition-all hover:scale-[1.02] shadow-xl flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 text-xl shrink-0">
+            <i class="fa-solid fa-handcuffs"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+              <h4 class="text-xs font-black uppercase tracking-wider text-rose-300">Kartu Merah</h4>
+            </div>
+            <p class="text-sm font-extrabold text-white">Hukuman / Sanksi</p>
+            <span class="text-[10px] text-rose-400/90 font-bold">-10 Poin / Disiplin</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Area Roda Putar Roulette -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden backdrop-blur-md">
+        
+        <!-- Jarum Penunjuk Atas (Arah Jam 12) -->
+        <div class="z-20 -mb-5 flex flex-col items-center pointer-events-none">
+          <div class="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[26px] border-t-amber-400 drop-shadow-[0_4px_8px_rgba(245,158,11,0.8)]"></div>
+        </div>
+
+        <!-- Canvas Roda -->
+        <div class="relative w-[280px] h-[280px] sm:w-[320px] h-[320px] flex items-center justify-center">
+          <canvas id="wheel-canvas" width="320" height="320" class="rounded-full shadow-2xl border-4 border-slate-700"></canvas>
+          
+          <!-- Tombol Spin di Titik Tengah -->
+          <button id="btn-spin" onclick="spinWheel()" class="absolute w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-tr from-slate-900 to-slate-800 border-4 border-amber-400 text-amber-400 rounded-full font-black text-xs sm:text-sm shadow-2xl flex flex-col items-center justify-center hover:scale-105 active:scale-95 transition-transform z-10 cursor-pointer">
+            <i class="fa-solid fa-play text-sm sm:text-base mb-0.5"></i>
+            <span>PUTAR</span>
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-400 mt-6 font-medium text-center">
+          Tekan tombol <strong class="text-amber-400">PUTAR</strong> di tengah atau langsung klik salah satu kartu di atas untuk mengambil tantangan!
+        </p>
+
+        <!-- Tombol Selesai & Kirim ke Google Sheet -->
+        <div class="mt-6 pt-4 border-t border-slate-800/80 w-full flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span class="text-xs text-slate-500">Kumpulkan poin sebanyak-banyaknya untuk meraih gelar Relawan Teladan.</span>
+          <button onclick="finishSessionAndClaim()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs sm:text-sm shadow-lg shadow-red-950 transition-all flex items-center gap-2 border border-red-500/30 cursor-pointer">
+            <i class="fa-solid fa-award"></i> Selesai & Ambil Piagam
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= MODAL KARTU TANTANGAN ================= -->
+    <div id="modal-card" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+      <div id="card-inner-box" class="bg-slate-900 border rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl transform transition-all relative overflow-hidden">
+        
+        <!-- Header Kartu -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+          <div class="flex items-center gap-2">
+            <span id="modal-card-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider">Kategori</span>
+            <span id="modal-card-icon" class="text-xs"></span>
+          </div>
+          <span id="modal-card-points" class="text-xs font-black px-2.5 py-1 rounded-lg border">+25 Poin</span>
+        </div>
+
+        <h3 id="modal-card-title" class="text-base sm:text-lg font-black text-white mb-2">Judul Misi</h3>
+        <div id="modal-card-desc" class="text-slate-200 text-xs sm:text-sm leading-relaxed mb-5 bg-slate-950 p-4 rounded-2xl border border-slate-800 font-medium"></div>
+
+        <!-- Timer Khusus Kartu Kuning (Aksi) -->
+        <div id="timer-box" class="hidden mb-4 p-3 bg-amber-950/40 border border-amber-700/60 rounded-2xl items-center justify-between">
+          <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-stopwatch fa-spin text-amber-400"></i> Batas Waktu Praktik:
+          </span>
+          <span id="timer-display" class="text-base font-black text-amber-400 font-mono">00:30</span>
+        </div>
+
+        <!-- Area Interaksi -->
+        <div id="modal-interactive-area" class="space-y-2.5 mb-4"></div>
+
+        <!-- Feedback Edukatif -->
+        <div id="modal-feedback-box" class="hidden p-4 rounded-2xl border text-xs sm:text-sm leading-relaxed mb-4"></div>
+
+        <button id="modal-btn-close" onclick="closeCardModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-black py-3 rounded-xl text-xs sm:text-sm transition-all hidden border border-slate-700 cursor-pointer">
+          Lanjutkan Permainan
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ================= MODAL LEADERBOARD & RIWAYAT ================= -->
+    <div id="modal-leaderboard" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden items-center justify-center p-3 sm:p-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4 shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg
